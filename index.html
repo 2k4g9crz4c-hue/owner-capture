@@ -133,6 +133,9 @@
     <button id="copyBtn" class="secondary">コピー</button>
   </div>
   <div id="status"></div>
+  <div class="buttons">
+    <button id="newBtn" class="secondary">新しい会話</button>
+  </div>
 </section>
 
 <script>
@@ -246,6 +249,16 @@
       document.execCommand('copy');
       setStatus('コピーしました');
     }
+  });
+
+  document.getElementById('newBtn').addEventListener('click', function () {
+    titleEl.value = '';
+    bodyEl.value = '';
+    categoryEl.value = 'Inbox';
+    previewEl.value = '';
+    resultSection.hidden = true;
+    statusEl.textContent = '';
+    titleEl.focus();
   });
 })();
 </script>
