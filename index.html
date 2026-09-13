@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>AI会話保存ツール</title>
+<style>
+  :root {
+    color-scheme: light dark;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 16px;
+    padding-bottom: 48px;
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", sans-serif;
+    background: #f5f5f7;
+    color: #1c1c1e;
+    max-width: 640px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  h1 {
+    font-size: 20px;
+    margin: 8px 0 4px;
+  }
+  p.lead {
+    font-size: 13px;
+    color: #6e6e73;
+    margin: 0 0 20px;
+  }
+  label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    margin: 16px 0 6px;
+  }
+  input[type="text"], textarea {
+    width: 100%;
+    font-size: 16px; /* iOSでズームさせないため16px以上 */
+    padding: 10px 12px;
+    border: 1px solid #d1d1d6;
+    border-radius: 10px;
+    background: #fff;
+    color: #1c1c1e;
+    font-family: inherit;
+  }
+  textarea {
+    min-height: 220px;
+    resize: vertical;
+    line-height: 1.5;
+  }
+  #preview {
+    min-height: 160px;
+    background: #fbfbfd;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 13px;
+  }
+  .buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  button {
+    flex: 1 1 auto;
+    min-width: 120px;
+    font-size: 16px;
+    padding: 12px 14px;
+    border: none;
+    border-radius: 10px;
+    background: #007aff;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button.secondary {
+    background: #e5e5ea;
+    color: #1c1c1e;
+  }
+  button:active {
+    opacity: 0.7;
+  }
+  #status {
+    margin-top: 10px;
+    font-size: 13px;
+    color: #34a853;
+    min-height: 18px;
+  }
+  section {
+    margin-top: 28px;
+  }
+  section h2 {
+    font-size: 15px;
+    margin-bottom: 6px;
+  }
+  @media (prefers-color-scheme: dark) {
+    body { background: #000; color: #f2f2f7; }
+    input[type="text"], textarea, #preview { background: #1c1c1e; color: #f2f2f7; border-color: #38383a; }
+    p.lead { color: #98989d; }
+    button.secondary { background: #2c2c2e; color: #f2f2f7; }
+  }
+</style>
+</head>
+<body>
+
+<h1>AI会話保存ツール</h1>
+<p class="lead">ChatGPTやClaudeとの会話をMarkdownに整形して、端末内だけで保存・共有します。入力内容はどこにも送信されません。</p>
+
+<label for="title">タイトル</label>
+<input type="text" id="title" placeholder="例: 旅行プランの相談">
+
+<label for="body">会話本文</label>
+<textarea id="body" placeholder="ここにChatGPTやClaudeとの会話をコピー&amp;ペーストしてください"></textarea>
+
+<div class="buttons">
+  <button id="buildBtn">Markdownに変換</button>
+</div>
+
+<section id="resultSection" hidden>
+  <h2>プレビュー</h2>
+  <textarea id="preview" readonly></textarea>
+  <div class="buttons">
+    <button id="shareBtn">共有 / ファイルに保存</button>
+    <button id="downloadBtn" class="secondary">ダウンロード</button>
+    <button id="copyBtn" class="secondary">コピー</button>
+  </div>
+  <div id="status"></div>
+</section>
+
+<script>
+(function () {
+  var titleEl = document.getElementById('title');
+  var bodyEl = document.getElementById('body');
+  var previewEl = document.getElementById('preview');
+  var resultSection = document.getElementById('resultSection');
+  var statusEl = document.getElementById('status');
+  var lastFilename = 'conversation.md';
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+
+  function isoLocal(d) {
+    var offsetMin = -d.getTimezoneOffset();
+    var sign = offsetMin >= 0 ? '+' : '-';
+    var abs = Math.abs(offsetMin);
+    var offset = sign + pad(Math.floor(abs / 60)) + ':' + pad(abs % 60);
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) +
+      'T' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds()) + offset;
+  }
+
+  function escapeYamlString(s) {
+    return s.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+  }
+
+  function sanitizeFilename(s) {
+    // ファイル名は英数字のみに限定する（日本語などを含めるとブラウザによって
+    // ダウンロード時のファイル名が "download" になってしまう問題を避けるため）。
+    // タイトル自体は本文側（フロントマターや見出し）にそのまま残る。
+    var cleaned = s.trim().replace(/[^A-Za-z0-9\-]+/g, '_').replace(/^_+|_+$/g, '');
+    return cleaned.length ? cleaned : 'conversation';
+  }
+
+  function buildMarkdown() {
+    var title = titleEl.value.trim() || '無題の会話';
+    var body = bodyEl.value;
+    var now = new Date();
+
+    var frontmatter = [
+      '---',
+      'title: "' + escapeYamlString(title) + '"',
+      'created: ' + isoLocal(now),
+      'tags: [ai-conversation]',
+      '---',
+      ''
+    ].join('\n');
+
+    var md = frontmatter + '\n# ' + title + '\n\n' + body + '\n';
+
+    var stamp = now.getFullYear() + pad(now.getMonth() + 1) + pad(now.getDate()) +
+      '-' + pad(now.getHours()) + pad(now.getMinutes());
+    lastFilename = stamp + '_' + sanitizeFilename(title) + '.md';
+
+    return md;
+  }
+
+  function setStatus(msg) {
+    statusEl.textContent = msg;
+    if (msg) {
+      setTimeout(function () {
+        if (statusEl.textContent === msg) statusEl.textContent = '';
+      }, 3000);
+    }
+  }
+
+  document.getElementById('buildBtn').addEventListener('click', function () {
+    var md = buildMarkdown();
+    previewEl.value = md;
+    resultSection.hidden = false;
+    resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  document.getElementById('downloadBtn').addEventListener('click', function () {
+    var blob = new Blob([previewEl.value], { type: 'text/markdown' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = lastFilename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    setStatus('ダウンロードしました: ' + lastFilename);
+  });
+
+  document.getElementById('shareBtn').addEventListener('click', async function () {
+    var md = previewEl.value;
+    try {
+      var file = new File([md], lastFilename, { type: 'text/markdown' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: lastFilename });
+        setStatus('共有しました');
+        return;
+      }
+    } catch (err) {
+      if (err && err.name === 'AbortError') return;
+    }
+    setStatus('この端末では共有が使えないため、ダウンロードまたはコピーをご利用ください');
+  });
+
+  document.getElementById('copyBtn').addEventListener('click', async function () {
+    try {
+      await navigator.clipboard.writeText(previewEl.value);
+      setStatus('コピーしました');
+    } catch (err) {
+      previewEl.select();
+      document.execCommand('copy');
+      setStatus('コピーしました');
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
