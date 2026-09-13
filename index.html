@@ -35,7 +35,7 @@
     font-weight: 600;
     margin: 16px 0 6px;
   }
-  input[type="text"], textarea {
+  input[type="text"], select, textarea {
     width: 100%;
     font-size: 16px; /* iOSでズームさせないため16px以上 */
     padding: 10px 12px;
@@ -96,7 +96,7 @@
   }
   @media (prefers-color-scheme: dark) {
     body { background: #000; color: #f2f2f7; }
-    input[type="text"], textarea, #preview { background: #1c1c1e; color: #f2f2f7; border-color: #38383a; }
+    input[type="text"], select, textarea, #preview { background: #1c1c1e; color: #f2f2f7; border-color: #38383a; }
     p.lead { color: #98989d; }
     button.secondary { background: #2c2c2e; color: #f2f2f7; }
   }
@@ -109,6 +109,13 @@
 
 <label for="title">タイトル</label>
 <input type="text" id="title" placeholder="例: 旅行プランの相談">
+
+<label for="category">カテゴリ</label>
+<select id="category">
+  <option value="Inbox" selected>Inbox</option>
+  <option value="Decision">Decision</option>
+  <option value="Idea">Idea</option>
+</select>
 
 <label for="body">会話本文</label>
 <textarea id="body" placeholder="ここにChatGPTやClaudeとの会話をコピー&amp;ペーストしてください"></textarea>
@@ -131,6 +138,7 @@
 <script>
 (function () {
   var titleEl = document.getElementById('title');
+  var categoryEl = document.getElementById('category');
   var bodyEl = document.getElementById('body');
   var previewEl = document.getElementById('preview');
   var resultSection = document.getElementById('resultSection');
@@ -162,6 +170,7 @@
 
   function buildMarkdown() {
     var title = titleEl.value.trim() || '無題の会話';
+    var category = categoryEl.value;
     var body = bodyEl.value;
     var now = new Date();
 
@@ -169,6 +178,7 @@
       '---',
       'title: "' + escapeYamlString(title) + '"',
       'created: ' + isoLocal(now),
+      'category: ' + category,
       'tags: [ai-conversation]',
       '---',
       ''

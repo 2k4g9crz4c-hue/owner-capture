@@ -9,6 +9,7 @@ ChatGPTやClaudeとの会話を、iPhoneのSafariから簡単にMarkdown形式�
 - ログインなし・データベースなし・外部API呼び出しなし
 - 入力した会話やタイトルは**どこにも送信されません**。すべてiPhoneのブラウザの中だけで処理されます
 - 保存したMarkdownファイルには「保存日時・タイトル・本文」が含まれます
+- カテゴリ（Inbox / Decision / Idea、初期値はInbox）を選択でき、フロントマターの`category`として保存されます
 - 将来Obsidianに取り込みやすいように、ファイルの先頭に`title`・`created`・`tags`を書いたフロントマター（YAML形式のメタ情報）を付けています
 
 ```markdown
