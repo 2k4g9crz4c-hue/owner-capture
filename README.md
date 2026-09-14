@@ -65,3 +65,12 @@ tags: [ai-conversation]
 - クラウドへの自動アップロード
 
 これらは「個人情報や会話内容を外部に送信しない」「シンプルに保つ」という方針のため、最小版としてはあえて含めていません。将来必要になったら追加を検討してください。
+
+## 外部脳（Obsidian Vault）を一緒に作る
+
+このリポジトリには、Claude Codeで使える`external-brain-installer`スキルを同梱しています（`.claude/skills/external-brain-installer/`）。owner-captureで保存したMarkdown（`Inbox`/`Decision`/`Idea`のカテゴリ付き）を受け止めるObsidian Vaultの構成を、日本語で一問一答しながら一緒に組み立てるスキルです。
+
+- 新しくVaultを作る（このリポジトリをそのままVaultにする／別の空フォルダに作る）
+- 既存のObsidian Vaultを診断し、承認した項目だけ非破壊的に整える
+
+コードの実行やソフトの導入・自動同期は行わず、フォルダ構成とMarkdownファイルを組み立てるだけです。Claude Codeでこのリポジトリを開き、「外部脳インストーラを使いたい」のように声をかけると始まります。
