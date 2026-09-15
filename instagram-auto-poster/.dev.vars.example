@@ -1,0 +1,8 @@
+# ローカル開発用（`wrangler dev`）のシークレット例。
+# コピーして .dev.vars を作り、実際の値を入れる（.dev.vars はgit管理対象外）。
+# 本番デプロイ時は `wrangler secret put <NAME>` で設定する。
+
+IG_ACCESS_TOKEN=your-long-lived-page-access-token
+IG_BUSINESS_ACCOUNT_ID=your-instagram-business-account-id
+API_KEY=choose-a-random-api-key
+GRAPH_API_VERSION=v21.0

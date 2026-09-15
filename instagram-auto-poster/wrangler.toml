@@ -1,0 +1,12 @@
+name = "owner-capture-instagram-poster"
+main = "src/index.js"
+compatibility_date = "2024-11-01"
+
+# 15分おきにRSSのポーリングと予約投稿の公開処理を実行する。
+# 頻度を変える場合はcron式を編集する（Instagram側の投稿上限は1アカウント24時間あたり25件）。
+[triggers]
+crons = ["*/15 * * * *"]
+
+[[kv_namespaces]]
+binding = "IG_POSTS"
+id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"

@@ -65,3 +65,7 @@ tags: [ai-conversation]
 - クラウドへの自動アップロード
 
 これらは「個人情報や会話内容を外部に送信しない」「シンプルに保つ」という方針のため、最小版としてはあえて含めていません。将来必要になったら追加を検討してください。
+
+## Instagram自動投稿（別モジュール）
+
+`instagram-auto-poster/` に、Instagramへ自動投稿するためのサーバーレスAPI（Cloudflare Workers）を用意しています。これはInstagram Graph API（外部API）とアクセストークンの利用が前提となるため、上記の「外部API呼び出しなし」という方針とは別の独立したモジュールとして分離しています。`index.html` 側の挙動には影響しません。詳細は [`instagram-auto-poster/README.md`](./instagram-auto-poster/README.md) を参照してください。
