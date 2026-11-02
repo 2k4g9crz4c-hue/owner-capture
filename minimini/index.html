@@ -1,0 +1,550 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:,">
+<title>ミニミニ｜言の葉</title>
+<style>
+  :root{
+    --bg:#f2f4f1;
+    --card:#ffffff;
+    --card-2:#f7f8f6;
+    --ink:#26302a;
+    --ink-2:#5c6a62;
+    --ink-3:#87938b;
+    --line:#dde3dd;
+    --accent:#4f7263;
+    --accent-ink:#ffffff;
+    --accent-soft:#e6efe9;
+    --chip:#eef2ee;
+    --shadow:0 10px 30px rgba(38,48,42,.08), 0 2px 8px rgba(38,48,42,.06);
+    --radius:18px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#171c1a;
+      --card:#222926;
+      --card-2:#1e2421;
+      --ink:#e8ede9;
+      --ink-2:#aebbb2;
+      --ink-3:#7f8f85;
+      --line:#333d37;
+      --accent:#8fb8a3;
+      --accent-ink:#14201a;
+      --accent-soft:#2a3630;
+      --chip:#2a332e;
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  *{box-sizing:border-box}
+  html{ -webkit-text-size-adjust:100%; }
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic UI","Yu Gothic",system-ui,-apple-system,Segoe UI,sans-serif;
+    line-height:1.7;
+  }
+  a{color:var(--accent)}
+  .wrap{max-width:680px;margin:0 auto;padding:20px 18px 36px}
+  .topbar{display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .brand-small{font-size:11px;letter-spacing:.14em;color:var(--ink-3);font-weight:600}
+  .brand-small strong{color:var(--ink-2);font-weight:700}
+  .step-count{font-size:12px;color:var(--ink-3);font-variant-numeric:tabular-nums;white-space:nowrap}
+
+  .hero{padding:28px 2px 8px}
+  .hero-kanji{
+    display:inline-flex;align-items:center;gap:10px;margin-bottom:14px
+  }
+  .leaf-mark{
+    width:36px;height:36px;border-radius:50%;background:var(--accent);color:var(--accent-ink);
+    display:grid;place-items:center;font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-size:18px;line-height:1
+  }
+  .hero h1{
+    font-family:"Hiragino Mincho ProN","Yu Mincho","Hiragino Mincho Pro",serif;
+    font-weight:600;font-size:38px;line-height:1.15;letter-spacing:.04em;margin:0
+  }
+  .hero h1 span{font-size:18px;letter-spacing:.08em;color:var(--ink-2);font-family:inherit;font-weight:500}
+  .hero-lead{margin:14px 0 0;color:var(--ink-2);font-size:15.5px;line-height:1.85;max-width:560px}
+  .hero-note{
+    margin-top:16px;padding:12px 14px;background:var(--card-2);border:1px solid var(--line);border-radius:12px;
+    font-size:13.5px;color:var(--ink-2);line-height:1.75
+  }
+  .hero-note b{color:var(--ink);font-weight:700}
+
+  .progress{margin:22px 0 14px}
+  .progress-track{height:4px;background:var(--line);border-radius:999px;overflow:hidden}
+  .progress-fill{height:100%;background:var(--accent);border-radius:999px;transition:width .35s ease;width:25%}
+  .progress-labels{display:flex;justify-content:space-between;margin-top:8px;font-size:11px;letter-spacing:.06em;color:var(--ink-3)}
+  .progress-labels span.active{color:var(--accent);font-weight:700}
+
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:22px 18px 18px
+  }
+  @media(min-width:560px){ .card{padding:28px 26px 22px} .wrap{padding-top:28px} }
+
+  .step{display:none}
+  .step.is-active{display:block;animation:fadeIn .28s ease both}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion: reduce){ .step.is-active{animation:none} .progress-fill{transition:none} }
+
+  .q-label{font-size:11px;letter-spacing:.14em;color:var(--accent);font-weight:700;margin:0 0 6px}
+  .q-title{
+    font-family:"Hiragino Mincho ProN","Yu Mincho",serif;
+    font-size:22px;line-height:1.45;font-weight:600;margin:0;letter-spacing:.02em
+  }
+  .q-sub{margin:8px 0 0;color:var(--ink-2);font-size:13.5px;line-height:1.7}
+
+  .options{margin-top:18px;display:flex;flex-direction:column;gap:10px}
+  .options.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .options.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  @media(max-width:420px){ .options.grid3{grid-template-columns:1fr 1fr 1fr} }
+
+  .opt{
+    appearance:none;border:1.5px solid var(--line);background:var(--card);color:var(--ink);
+    border-radius:14px;padding:14px 14px;text-align:left;cursor:pointer;width:100%;
+    display:flex;gap:14px;align-items:flex-start;min-height:64px;
+    transition:border-color .15s, background .15s, transform .08s;
+    font:inherit;
+  }
+  .opt:active{transform:scale(.99)}
+  .opt:hover{border-color:var(--accent)}
+  .opt:focus-visible{outline:3px solid var(--accent-soft);outline-offset:2px;border-color:var(--accent)}
+  .opt[aria-checked="true"]{border-color:var(--accent);background:var(--accent-soft)}
+
+  .opt-kanji{
+    flex:0 0 auto;width:48px;height:48px;border-radius:50%;display:grid;place-items:center;
+    font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-size:22px;line-height:1;
+    background:var(--chip);color:var(--ink);border:1px solid var(--line)
+  }
+  .opt-kanji.fire{background:#fdf0e9;border-color:#f0d2c2;color:#9a4a2e}
+  .opt-kanji.earth{background:#f6f1de;border-color:#e6dcb8;color:#6b5e2f}
+  .opt-kanji.wind{background:#eaf3f3;border-color:#cfe2e2;color:#3e6b6e}
+  .opt-kanji.water{background:#eaf0f8;border-color:#cfdeed;color:#3e5f86}
+  .opt-kanji.light{background:#fdf6d8;border-color:#eee2a8;color:#7a651f}
+  .opt-kanji.shadow{background:#ececf2;border-color:#d6d6e2;color:#4a4e66}
+  @media (prefers-color-scheme: dark){
+    .opt-kanji.fire{background:#3a2a24;border-color:#5a4036;color:#e8a88a}
+    .opt-kanji.earth{background:#33301f;border-color:#55502f;color:#ddd09a}
+    .opt-kanji.wind{background:#223434;border-color:#355252;color:#a8d0d0}
+    .opt-kanji.water{background:#233040;border-color:#38506a;color:#a8c2e0}
+    .opt-kanji.light{background:#35301a;border-color:#5a5226;color:#e8d98a}
+    .opt-kanji.shadow{background:#2a2a36;border-color:#44465e;color:#c2c4d8}
+  }
+  .opt-main{flex:1;min-width:0;padding-top:2px}
+  .opt-name{font-weight:700;font-size:16px;line-height:1.4;display:block}
+  .opt-desc{font-size:13px;color:var(--ink-2);line-height:1.6;display:block;margin-top:2px}
+
+  .opt-center{flex-direction:column;align-items:center;text-align:center;justify-content:center;gap:6px;padding:18px 8px}
+  .opt-center .opt-name{font-size:18px}
+  .opt-center .opt-desc{font-size:12px;text-align:center}
+
+  .opt-phase{flex-direction:column;gap:8px;padding:18px 16px}
+  .yin-yang{font-size:28px;line-height:1;font-family:"Hiragino Mincho ProN","Yu Mincho",serif}
+
+  .nav-row{display:flex;gap:10px;margin-top:18px;align-items:center}
+  .btn{
+    appearance:none;border-radius:999px;padding:11px 18px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--ink)
+  }
+  .btn-ghost{background:transparent}
+  .btn-primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+  .btn:focus-visible{outline:3px solid var(--accent-soft);outline-offset:2px}
+  .spacer{flex:1}
+  .hint{font-size:12px;color:var(--ink-3)}
+
+  /* Result */
+  .result{display:none}
+  .result.is-active{display:block;animation:fadeIn .35s ease both}
+  .weather-head{
+    display:flex;gap:16px;align-items:flex-start;padding-bottom:18px;border-bottom:1px solid var(--line)
+  }
+  .weather-icon{
+    width:64px;height:64px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;
+    font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-size:30px;border:1.5px solid var(--line);background:var(--card-2)
+  }
+  .weather-title{font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-size:20px;line-height:1.5;font-weight:600;margin:2px 0 4px}
+  .weather-sub{font-size:13px;color:var(--ink-2);line-height:1.6;margin:0}
+  .coords{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+  .chip{background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:5px 10px;font-size:12px;font-weight:600;color:var(--ink-2);line-height:1.4}
+  .chip b{color:var(--ink)}
+  .result-body{padding-top:18px}
+  .result-body p{margin:0 0 14px;font-size:15.5px;line-height:1.95;color:var(--ink)}
+  .result-body p.muted{color:var(--ink-2);font-size:14.5px}
+  .snapshot-note{
+    background:var(--accent-soft);border-radius:12px;padding:13px 14px;font-size:13.5px;line-height:1.8;color:var(--ink-2);margin:18px 0
+  }
+  .snapshot-note strong{color:var(--ink)}
+  .closing{
+    margin-top:20px;padding:18px 16px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+    text-align:center
+  }
+  .closing p{
+    font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-size:16.5px;line-height:1.9;margin:0;color:var(--ink);font-weight:600;letter-spacing:.02em
+  }
+  .result-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+  .free-note{margin-top:14px}
+  .free-note label{font-size:12px;letter-spacing:.08em;font-weight:700;color:var(--ink-2);display:block;margin-bottom:6px}
+  .free-note textarea{
+    width:100%;border:1.5px solid var(--line);border-radius:12px;padding:12px 12px;font:inherit;font-size:14.5px;line-height:1.7;background:var(--card);color:var(--ink);resize:vertical;min-height:64px
+  }
+  .free-note textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  .free-echo{font-size:14px;line-height:1.85;color:var(--ink-2);margin-top:10px;display:none}
+  .free-echo.is-visible{display:block}
+
+  footer{margin-top:22px;text-align:center}
+  footer p{font-size:11px;letter-spacing:.08em;color:var(--ink-3);line-height:1.8;margin:0}
+  .os-strip{margin-top:16px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+  .os-strip span{font-size:11px;color:var(--ink-3);border:1px solid var(--line);background:var(--card);border-radius:999px;padding:4px 9px}
+  .os-strip span.current{color:var(--accent);border-color:var(--accent);font-weight:700;background:var(--accent-soft)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand-small">KOTONOHA &nbsp;·&nbsp; <strong>言の葉プロジェクト 試作</strong></div>
+    <div class="step-count" id="stepCount">入口 — ミニミニ</div>
+  </div>
+
+  <header class="hero">
+    <div class="hero-kanji"><span class="leaf-mark" aria-hidden="true">葉</span><span style="font-size:12px;letter-spacing:.16em;color:var(--ink-3);font-weight:700">MINI MINI — 心の現在地</span></div>
+    <h1>ミニミニ <span>｜ 言の葉</span></h1>
+    <p class="hero-lead">いまの心は、どこにありますか。<br>4つのタップで、現在地だけを静かに言葉にします。診断でも、助言でもありません。</p>
+    <div class="hero-note"><b>この入口の約束：</b>現在地を表示するだけです。性格を決めつけたり、「こうすべき」とは言いません。選んだ答えは、今この瞬間の心のスナップショットとして返します。</div>
+    <div class="os-strip" aria-label="言の葉OSの順序">
+      <span class="current">0 ミニミニ ・ 現在地</span><span>1 ライト ・ 安心</span><span>2 診断30 ・ 構造</span><span>3 チェックリスト ・ 制御</span><span>4 ビジョン</span><span>5 ビヨンド</span>
+    </div>
+  </header>
+
+  <div class="progress" aria-hidden="true">
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-labels">
+      <span data-plabel="1" class="active">感情</span><span data-plabel="2">強さ</span><span data-plabel="3">関係</span><span data-plabel="4">位相</span><span data-plabel="5">現在地</span>
+    </div>
+  </div>
+
+  <main class="card" id="card">
+    <!-- STEP 1 -->
+    <section class="step is-active" data-step="1" aria-labelledby="q1">
+      <p class="q-label">STEP 1 / 4 — いまの感情</p>
+      <h2 class="q-title" id="q1">いまの感情に、いちばん近いものは？</h2>
+      <p class="q-sub">六つのエレメントから、直感でひとつ。迷ったら、いま体で感じている方を選んでください。</p>
+      <div class="options" role="radiogroup" aria-label="いまの感情">
+        <button type="button" class="opt" data-group="element" data-value="fire" role="radio" aria-checked="false">
+          <span class="opt-kanji fire">火</span>
+          <span class="opt-main"><span class="opt-name">火</span><span class="opt-desc">怒り・イライラ・突き動かされる感じ</span></span>
+        </button>
+        <button type="button" class="opt" data-group="element" data-value="earth" role="radio" aria-checked="false">
+          <span class="opt-kanji earth">地</span>
+          <span class="opt-main"><span class="opt-name">地</span><span class="opt-desc">安心したい・守りたい・落ち着きたい</span></span>
+        </button>
+        <button type="button" class="opt" data-group="element" data-value="wind" role="radio" aria-checked="false">
+          <span class="opt-kanji wind">風</span>
+          <span class="opt-main"><span class="opt-name">風</span><span class="opt-desc">自由になりたい・逃げたい・気持ちが散る</span></span>
+        </button>
+        <button type="button" class="opt" data-group="element" data-value="water" role="radio" aria-checked="false">
+          <span class="opt-kanji water">水</span>
+          <span class="opt-main"><span class="opt-name">水</span><span class="opt-desc">悲しみ・寂しさ・傷つき・やさしさ</span></span>
+        </button>
+        <button type="button" class="opt" data-group="element" data-value="light" role="radio" aria-checked="false">
+          <span class="opt-kanji light">光</span>
+          <span class="opt-main"><span class="opt-name">光</span><span class="opt-desc">認められたい・大切にされたい</span></span>
+        </button>
+        <button type="button" class="opt" data-group="element" data-value="shadow" role="radio" aria-checked="false">
+          <span class="opt-kanji shadow">闇</span>
+          <span class="opt-main"><span class="opt-name">闇</span><span class="opt-desc">不安・孤独・自信のなさ・恥ずかしさ</span></span>
+        </button>
+      </div>
+      <div class="nav-row"><span class="hint">タップすると次へ進みます</span><span class="spacer"></span></div>
+    </section>
+
+    <!-- STEP 2 -->
+    <section class="step" data-step="2" aria-labelledby="q2">
+      <p class="q-label">STEP 2 / 4 — 体感強度</p>
+      <h2 class="q-title" id="q2">その感覚の強さは、どれくらいですか？</h2>
+      <p class="q-sub">体で感じている強さで選んでください。弱い・強いに、良い悪いはありません。</p>
+      <div class="options grid3" role="radiogroup" aria-label="体感強度">
+        <button type="button" class="opt opt-center" data-group="intensity" data-value="weak" role="radio" aria-checked="false">
+          <span class="opt-name">弱</span><span class="opt-desc">かすかに<br>感じる</span>
+        </button>
+        <button type="button" class="opt opt-center" data-group="intensity" data-value="mid" role="radio" aria-checked="false">
+          <span class="opt-name">中</span><span class="opt-desc">はっきりと<br>感じる</span>
+        </button>
+        <button type="button" class="opt opt-center" data-group="intensity" data-value="strong" role="radio" aria-checked="false">
+          <span class="opt-name">強</span><span class="opt-desc">強く<br>揺れている</span>
+        </button>
+      </div>
+      <div class="nav-row">
+        <button type="button" class="btn btn-ghost" data-back>← 戻る</button>
+        <button type="button" class="btn btn-ghost restart-any">最初から</button>
+        <span class="spacer"></span><span class="hint">タップで次へ</span>
+      </div>
+    </section>
+
+    <!-- STEP 3 -->
+    <section class="step" data-step="3" aria-labelledby="q3">
+      <p class="q-label">STEP 3 / 4 — 関係軸</p>
+      <h2 class="q-title" id="q3">その感覚は、どこにありますか？</h2>
+      <p class="q-sub">感情が向いている先、関係している相手に近いものを選んでください。</p>
+      <div class="options grid2" role="radiogroup" aria-label="関係軸">
+        <button type="button" class="opt opt-center" data-group="relation" data-value="self" role="radio" aria-checked="false">
+          <span class="opt-name">自分</span><span class="opt-desc">自分の内側で<br>起きている</span>
+        </button>
+        <button type="button" class="opt opt-center" data-group="relation" data-value="other" role="radio" aria-checked="false">
+          <span class="opt-name">相手</span><span class="opt-desc">誰かとのあいだで<br>起きている</span>
+        </button>
+        <button type="button" class="opt opt-center" data-group="relation" data-value="ai" role="radio" aria-checked="false">
+          <span class="opt-name">AI</span><span class="opt-desc">AIとのやりとりで<br>起きている</span>
+        </button>
+        <button type="button" class="opt opt-center" data-group="relation" data-value="world" role="radio" aria-checked="false">
+          <span class="opt-name">世界</span><span class="opt-desc">まわりの出来事や<br>世の中に対して</span>
+        </button>
+      </div>
+      <div class="nav-row">
+        <button type="button" class="btn btn-ghost" data-back>← 戻る</button>
+        <button type="button" class="btn btn-ghost restart-any">最初から</button>
+        <span class="spacer"></span><span class="hint">タップで次へ</span>
+      </div>
+    </section>
+
+    <!-- STEP 4 -->
+    <section class="step" data-step="4" aria-labelledby="q4">
+      <p class="q-label">STEP 4 / 4 — 位相</p>
+      <h2 class="q-title" id="q4">いまの心の向きは、どちらに近いですか？</h2>
+      <p class="q-sub">陰と陽は優劣ではありません。エネルギーの向きの違いです。</p>
+      <div class="options grid2" role="radiogroup" aria-label="位相">
+        <button type="button" class="opt opt-phase" data-group="phase" data-value="yin" role="radio" aria-checked="false">
+          <span class="yin-yang">陰</span>
+          <span class="opt-main"><span class="opt-name">陰 — 内向き</span><span class="opt-desc">静的で、心の中で処理している。言葉になる前の時間。</span></span>
+        </button>
+        <button type="button" class="opt opt-phase" data-group="phase" data-value="yang" role="radio" aria-checked="false">
+          <span class="yin-yang">陽</span>
+          <span class="opt-main"><span class="opt-name">陽 — 外向き</span><span class="opt-desc">動的で、言葉や行動に出やすい。外へ向かっている時間。</span></span>
+        </button>
+      </div>
+      <div class="nav-row">
+        <button type="button" class="btn btn-ghost" data-back>← 戻る</button>
+        <button type="button" class="btn btn-ghost restart-any">最初から</button>
+        <span class="spacer"></span><span class="hint">タップすると現在地が出ます</span>
+      </div>
+    </section>
+
+    <!-- RESULT -->
+    <section class="result" id="result" aria-labelledby="resultTitle" aria-live="polite">
+      <p class="q-label">あなたの現在地 — 心の天気図</p>
+      <div class="weather-head">
+        <div class="weather-icon" id="weatherIcon">地</div>
+        <div style="flex:1;min-width:0">
+          <h2 class="weather-title" id="resultTitle">静かに地に足のつく空気</h2>
+          <p class="weather-sub" id="resultSub">いまこの瞬間の心のスナップショットです。</p>
+          <div class="coords" id="coords"></div>
+        </div>
+      </div>
+      <div class="result-body">
+        <p id="resultP1"></p>
+        <p id="resultP2"></p>
+        <p class="muted" id="resultP3"></p>
+        <div class="snapshot-note">
+          <strong>これは「あなたの性格」ではありません。</strong><br>
+          今この瞬間の心のスナップショットです。天気のように、心も移ります。必要なとき、またここに戻ってきてください。
+        </div>
+
+        <div class="free-note">
+          <label for="freeText">⑤ いまの感情を、ひとこと言葉にするとしたら（任意）</label>
+          <textarea id="freeText" placeholder="ひとことでも大丈夫です。書かなくても、現在地はそのまま残ります。" rows="2"></textarea>
+          <p class="free-echo" id="freeEcho"></p>
+        </div>
+
+        <div class="closing">
+          <p>これは、自分を変えるための時間ではありません。<br>自分に戻るための、確認の時間です。</p>
+        </div>
+
+        <div class="result-actions">
+          <button type="button" class="btn btn-primary" id="restartBtn2">最初からやり直す</button>
+          <button type="button" class="btn" id="backToLast">ひとつ戻って選び直す</button>
+        </div>
+        <p style="font-size:12.5px;color:var(--ink-3);line-height:1.7;margin:14px 0 0">ミニミニは現在地を示す入口です。この先にある「安心」「構造」「制御」は、別の場所で、順序を守って扱います。ここでは急がず、現在地だけを確認します。</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>言の葉プロジェクト 試作 — ミニミニ<br>人を操作しない／人を分解して壊さない／感情を終点にしない<br>言の葉とは、人の感情と経験に名前を与え、思考を再現可能な判断OSとして定着させるための運用思想である。</p>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var state = { element:null, intensity:null, relation:null, phase:null };
+  var current = 1;
+
+  var ELEMENTS = {
+    fire: {
+      kanji:'火', weather:'熱を含んだ空気', cls:'fire',
+      desc:'火は、怒りやイライラ、そして何かに突き動かされる感覚に近いエレメントです。大切なものが雑に扱われたように感じたとき、放っておけない気持ちが湧いたときに、心の中で熱を持つことがあります。',
+      note:'その熱は、あなたが何かを大切にしてきたことと、無関係ではありません。いまは、その熱があるということだけを、事実としてここに置きます。'
+    },
+    earth: {
+      kanji:'地', weather:'静かに地に足のつく空気', cls:'earth',
+      desc:'地は、安心したい、守りたい、落ち着きたいという感覚に近いエレメントです。外へ拡がるよりも、内側に「落ち着ける場所」を確保しようとする心の動きです。心の静けさと、持続的な安心感を求める方向に、いま心が向いています。',
+      note:'揺れる中で静けさを求めることは、ごく自然な動きです。それは弱さでも後退でもなく、いまのあなたがそう在っているという事実です。'
+    },
+    wind: {
+      kanji:'風', weather:'向きの定まらない風', cls:'wind',
+      desc:'風は、自由になりたい、少し離れたい、気持ちが散るような感覚に近いエレメントです。一か所にとどまるよりも、空気を入れ替えたいときに、心に風が通ります。',
+      note:'散っているように感じても、それは心が次の居場所や、呼吸できる余白を探している動きでもあります。いまは、その風があることを確認します。'
+    },
+    water: {
+      kanji:'水', weather:'静かに満ちる水面', cls:'water',
+      desc:'水は、悲しみや寂しさ、傷つき、そしてやさしさに近いエレメントです。言葉になる前に、胸の奥で静かに満ちていくような感覚です。',
+      note:'感じやすさは、人の気持ちに触れる力と隣り合わせにあります。いま満ちているものを、良い悪いで分けずに、そのままここに置きます。'
+    },
+    light: {
+      kanji:'光', weather:'やわらかく差す光', cls:'light',
+      desc:'光は、認められたい、大切にされたいという感覚に近いエレメントです。自分のしたことや存在が、誰かに届いているかを確認したくなる心の動きです。',
+      note:'認められたい気持ちは、誰かとつながって生きている証でもあります。その願いがあることを、静かに確認します。'
+    },
+    shadow: {
+      kanji:'闇', weather:'霧のかかった静けさ', cls:'shadow',
+      desc:'闇は、不安や孤独、自信のなさ、恥ずかしさに近いエレメントです。はっきり見えないからこそ、心が慎重になり、内側にこもりやすくなる感覚です。',
+      note:'見えにくい時間にも、心はちゃんと周りを確かめようとしています。霧があるということ自体が、いまの天気です。'
+    }
+  };
+
+  var INTENSITY = {
+    weak: { label:'弱', phrase:'かすかに、静かな強さで感じられ' },
+    mid: { label:'中', phrase:'はっきりと感じられる強さでそこにあり' },
+    strong: { label:'強', phrase:'強く、大きく揺れるほどの強さで感じられ' }
+  };
+  var RELATION = {
+    self: { label:'自分', phrase:'ご自身の内側' },
+    other: { label:'相手', phrase:'誰かとのあいだ' },
+    ai: { label:'AI', phrase:'AIとのやりとりのなか' },
+    world: { label:'世界', phrase:'まわりの出来事や世の中とのあいだ' }
+  };
+  var PHASE = {
+    yin: { label:'陰', phrase:'内向き・静的で、心の中で静かに処理している位相', extra:'外に出す前の、内側で言葉や感覚を確かめている時間として表れています。結論を急ぐ段階ではなく、眺めることに向いた状態です。' },
+    yang: { label:'陽', phrase:'外向き・動的で、言葉や行動に出やすい位相', extra:'外へ向かうエネルギーが動いている時間として表れています。その動きがあることを、評価せずに確認します。' }
+  };
+
+  var steps = document.querySelectorAll('.step');
+  var resultEl = document.getElementById('result');
+  var fill = document.getElementById('progressFill');
+  var stepCount = document.getElementById('stepCount');
+  var plabels = document.querySelectorAll('[data-plabel]');
+
+  function showStep(n){
+    current = n;
+    steps.forEach(function(s){ s.classList.toggle('is-active', Number(s.getAttribute('data-step'))===n); });
+    resultEl.classList.remove('is-active');
+    var pct = n===1?25:n===2?50:n===3?75:100;
+    // result uses 100 as well but with different label
+    fill.style.width = pct + '%';
+    stepCount.textContent = 'ステップ ' + n + ' / 4 — ミニミニ';
+    plabels.forEach(function(el){
+      var idx = Number(el.getAttribute('data-plabel'));
+      el.classList.toggle('active', idx===n);
+    });
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+  function showResult(){
+    steps.forEach(function(s){ s.classList.remove('is-active'); });
+    resultEl.classList.add('is-active');
+    fill.style.width = '100%';
+    stepCount.textContent = '現在地 — ミニミニ';
+    plabels.forEach(function(el){
+      var idx = Number(el.getAttribute('data-plabel'));
+      el.classList.toggle('active', idx===5);
+    });
+
+    var e = ELEMENTS[state.element];
+    var inten = INTENSITY[state.intensity];
+    var rel = RELATION[state.relation];
+    var ph = PHASE[state.phase];
+
+    document.getElementById('weatherIcon').textContent = e.kanji;
+    document.getElementById('weatherIcon').className = 'weather-icon opt-kanji ' + e.cls;
+    // weather-icon styles override: keep circle
+    document.getElementById('weatherIcon').style.width='64px';
+    document.getElementById('weatherIcon').style.height='64px';
+    document.getElementById('weatherIcon').style.fontSize='30px';
+
+    document.getElementById('resultTitle').textContent = e.weather + ' — ' + e.kanji + 'の現在地';
+    document.getElementById('resultSub').textContent = 'いま、' + rel.phrase + 'に、' + e.kanji + 'の気配があります。';
+
+    var coords = document.getElementById('coords');
+    coords.innerHTML = '';
+    [
+      ['感情', e.kanji],
+      ['強さ', inten.label],
+      ['関係', rel.label],
+      ['位相', ph.label]
+    ].forEach(function(pair){
+      var span=document.createElement('span'); span.className='chip';
+      span.innerHTML = pair[0] + ' &nbsp;<b></b>';
+      span.querySelector('b').textContent = pair[1];
+      coords.appendChild(span);
+    });
+
+    document.getElementById('resultP1').textContent = e.desc;
+    document.getElementById('resultP2').textContent = 'いま、その気配は' + inten.phrase + '、' + rel.phrase + 'にあります。位相は「' + ph.label + '」――' + ph.phrase + 'です。' + ph.extra;
+    document.getElementById('resultP3').textContent = e.note;
+
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  function selectOption(btn){
+    var group = btn.getAttribute('data-group');
+    var value = btn.getAttribute('data-value');
+    state[group]=value;
+    // mark selected in group
+    document.querySelectorAll('[data-group="'+group+'"]').forEach(function(b){
+      b.setAttribute('aria-checked', b===btn ? 'true':'false');
+    });
+    // advance
+    if(group==='element') showStep(2);
+    else if(group==='intensity') showStep(3);
+    else if(group==='relation') showStep(4);
+    else if(group==='phase') showResult();
+  }
+
+  document.querySelectorAll('.opt').forEach(function(btn){
+    btn.addEventListener('click', function(){ selectOption(btn); });
+  });
+  document.querySelectorAll('[data-back]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if(current>1) showStep(current-1);
+    });
+  });
+
+  function restart(){
+    state={element:null,intensity:null,relation:null,phase:null};
+    document.querySelectorAll('.opt').forEach(function(b){ b.setAttribute('aria-checked','false'); });
+    var ta=document.getElementById('freeText'); if(ta) ta.value='';
+    var echo=document.getElementById('freeEcho'); if(echo){ echo.textContent=''; echo.classList.remove('is-visible'); }
+    showStep(1);
+  }
+  document.getElementById('restartBtn2').addEventListener('click', restart);
+  document.querySelectorAll('.restart-any').forEach(function(b){ b.addEventListener('click', restart); });
+  document.getElementById('backToLast').addEventListener('click', function(){ showStep(4); });
+
+  var freeText=document.getElementById('freeText');
+  var freeEcho=document.getElementById('freeEcho');
+  freeText.addEventListener('input', function(){
+    var v=freeText.value.trim();
+    if(v){
+      freeEcho.textContent = 'あなたの言葉：「' + v + '」 — その言葉も含めて、いまの現在地です。';
+      freeEcho.classList.add('is-visible');
+    } else {
+      freeEcho.textContent=''; freeEcho.classList.remove('is-visible');
+    }
+  });
+
+  // init
+  showStep(1);
+})();
+</script>
+</body>
+</html>
